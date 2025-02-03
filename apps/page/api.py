@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.websockets import WebSocket
 from fastapi.websockets import WebSocketDisconnect
+from starlette.responses import FileResponse
 from user_agents import parse
 from configs.settings import get_settings
 
@@ -23,6 +24,18 @@ async def index_page(
         name="index.html",
         context={"is_debug": runtime_settings.IS_DEBUG},
     )
+
+
+@page_router.get("/apple-touch-icon-precomposed.png")
+async def apple_touch_icon_precomposed(
+    request: Request,
+):
+    return FileResponse("static/apple-touch-icon-precomposed.png")
+
+
+@page_router.get("/apple-touch-icon.png")
+async def apple_touch_icon():
+    return FileResponse("static/apple-touch-icon.png")
 
 
 @page_router.get("/result")
