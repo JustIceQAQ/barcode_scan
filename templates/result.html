@@ -1,16 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Result</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+Barcode 掃描結果
+{% endblock %}
+
+{% block head %}
 <style>
     .pages {
         display: flex;
         justify-content: space-around;
     }
 </style>
+{% endblock %}
+
+{% block body %}
 <div class="pages">
     <div>
         <ul id="scanResult">Scan Result</ul>
@@ -19,8 +22,9 @@
         <ul id="connectedDevices">Connected Device</ul>
     </div>
 </div>
+{% endblock %}
 
-</body>
+{% block script %}
 <script>
     const cleanConnectedDevice = () => {
         let connectedDevices = document.getElementById('connectedDevices');
@@ -68,5 +72,4 @@
         }
     };
 </script>
-
-</html>
+{% endblock %}
