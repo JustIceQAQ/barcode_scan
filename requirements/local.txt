@@ -1,4 +1,6 @@
 -r base.txt
 
+uvicorn # https://github.com/encode/uvicorn
+
 pre-commit  # https://github.com/pre-commit/pre-commit
 bump-my-version # https://github.com/callowayproject/bump-my-version
