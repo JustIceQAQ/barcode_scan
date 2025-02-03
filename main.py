@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+
 from apps.page.api import page_router
 
 
@@ -9,6 +10,7 @@ def app_factory(lifespan_) -> FastAPI:
     from configs.settings import get_settings
     from configs import TITLE, VERSION
     from fastapi.openapi.utils import get_openapi
+    from fastapi.staticfiles import StaticFiles
     from apps.routers import apis_router
 
     runtime_settings = get_settings()
@@ -24,6 +26,7 @@ def app_factory(lifespan_) -> FastAPI:
         },
         lifespan=lifespan_,
     )
+    app_.mount("/static", StaticFiles(directory="static"), name="static")
 
     app_.include_router(apis_router)
     app_.include_router(page_router)
