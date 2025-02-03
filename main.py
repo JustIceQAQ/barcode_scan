@@ -49,7 +49,12 @@ def app_factory(lifespan_) -> FastAPI:
 
 
 async def startup() -> None:
-    pass
+    from configs.settings import get_settings
+    import logging
+
+    logger = logging.getLogger("uvicorn.error")
+    runtime_settings = get_settings()
+    logger.info(f"You are running [{runtime_settings.ENVIRONMENT}] environment.")
 
 
 async def shutdown() -> None:
