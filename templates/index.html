@@ -1,22 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Barcode 掃描器</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-    <style>
-        video {
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}
+Barcode 掃描器
+{% endblock %}
+
+{% block head %}
+<style>
+    video {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+
+{% block body %}
 <button id="startButton">開始掃描</button>
 <div id="interactive" class="viewport"></div>
 <div id="result"></div>
+{% endblock %}
 
-</body>
+{% block script %}
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
 <script>
@@ -88,5 +91,5 @@
 
 
 </script>
-
+{% endblock %}
 </html>
