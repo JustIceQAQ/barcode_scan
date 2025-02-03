@@ -38,6 +38,9 @@ Barcode 掃描器
 
 {% block body %}
 <div class="outside">
+    <div id="statusBar" class="fixed-top text-white text-center py-2 bg-secondary">
+        🔄 檢查連線中...
+    </div>
     <div class="inside">
         <button id="startButton" class="btn btn-primary btn-lg">開始掃描</button>
         <div id="interactive" class="viewport"></div>
@@ -51,6 +54,18 @@ Barcode 掃描器
 {% block script %}
 
 <script>
+    let ws;
+    function setStatus(isConnected) {
+        const statusBar = document.getElementById('statusBar');
+        if (isConnected) {
+            statusBar.textContent = '✅ 已連線';
+            statusBar.className = 'fixed-top text-white text-center py-2 bg-success';
+        } else {
+            statusBar.textContent = '❌ 已斷線';
+            statusBar.className = 'fixed-top text-white text-center py-2 bg-danger';
+        }
+    }
+
     const generateGuid = () => {
         return Math.random().toString(36).substring(2, 15) +
             Math.random().toString(36).substring(2, 15);
@@ -60,7 +75,33 @@ Barcode 掃描器
         "http:": "ws",
         "https:": "wss"
     }
-    const ws = new WebSocket(`${protocol[document.location.protocol]}:///${document.location.host}/ws/scan/${thisGuid}`);
+
+    function connectWebSocket() {
+        if (ws) {
+            ws.close(); // 關閉舊的連線
+        }
+        const wsUrl = `${protocol[document.location.protocol]}://${document.location.host}/ws/scan/${thisGuid}`;
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function () {
+            console.log("✅ WebSocket 連線成功");
+            setStatus(true);
+        };
+
+        ws.onclose = function () {
+            console.log("❌ WebSocket 斷線，嘗試重新連線...");
+            setStatus(false);
+            setTimeout(connectWebSocket, 5000); // 5 秒後重新連線
+        };
+
+        ws.onerror = function (error) {
+            console.error("WebSocket 發生錯誤", error);
+            ws.close(); // 出錯時關閉連線，觸發 `onclose`
+        };
+    }
+
+    // 🚀 頁面載入時自動連線
+    connectWebSocket();
 
 
 </script>

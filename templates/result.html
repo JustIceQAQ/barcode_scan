@@ -6,21 +6,25 @@ Barcode 掃描結果
 
 {% block head %}
 <style>
-    .pages {
-        display: flex;
-        justify-content: space-around;
-    }
 
     body {
         background-color: #CCE8CC;
         color: #3A3A3A;
     }
+
+    .container {
+        margin-top: 50px; /* 讓內容往下移，避免被狀態條擋住 */
+    }
 </style>
 {% endblock %}
 
 {% block body %}
+<div id="statusBar" class="fixed-top text-white text-center py-2 bg-secondary">
+    🔄 檢查連線中...
+</div>
 <div class="container">
-    <div class="row align-items-start">
+
+    <div class="row">
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
@@ -49,6 +53,23 @@ Barcode 掃描結果
 
 {% block script %}
 <script>
+    let ws;
+
+    function setStatus(isConnected, remainingTime = 0) {
+            const statusBar = document.getElementById('statusBar');
+            if (isConnected) {
+                statusBar.textContent = '✅ WebSocket 已連線';
+                statusBar.className = 'fixed-top text-white text-center py-2 bg-success';
+            } else {
+                if (remainingTime > 0) {
+                    statusBar.textContent = `❌ WebSocket 斷線，將於 ${remainingTime} 秒後重試...`;
+                } else {
+                    statusBar.textContent = '❌ WebSocket 斷線，嘗試重新連線...';
+                }
+                statusBar.className = 'fixed-top text-white text-center py-2 bg-danger';
+            }
+        }
+
     const cleanConnectedDevice = () => {
         let connectedDevices = document.getElementById('connectedDevices');
         let children = [...connectedDevices.children];
@@ -71,28 +92,74 @@ Barcode 掃描結果
         "http:": "ws",
         "https:": "wss"
     }
+    let retryInterval = 5000;  // 初始重試間隔：5秒
+    const maxRetryInterval = 30000; // 最大重試間隔：30秒
+    let retryTimer;
+    let countdownTimer;
 
-    var ws = new WebSocket(`${protocol[document.location.protocol]}://${document.location.host}/ws/result`);
-    ws.onmessage = function (event) {
-        let runtimeData;
-        try {
-            runtimeData = JSON.parse(JSON.parse(event.data));
-        } catch (error) {
-            console.error("JSON 解析錯誤:", error);
-            return;  // 如果解析失敗就直接返回
+
+    function connectWebSocket() {
+        if (ws) {
+            ws.close(); // 關閉舊的連線
         }
-        if ('devices' in runtimeData) {
-            cleanConnectedDevice()
-            let connectedDevices = document.getElementById('connectedDevices')
-            let devices = runtimeData['devices']
-            devices.forEach(device => {
-                connectedDevices.appendChild(Li(`${device["connect_id"]} - \n${device["name"]}`));
-            });
-        } else if ('barcode' in runtimeData) {
-            let scanResult = document.getElementById('scanResult')
-            let barcode = runtimeData['barcode']
-            scanResult.appendChild(Li(`${barcode["code"]}`));
-        }
-    };
+        const wsUrl = `${protocol[document.location.protocol]}://${document.location.host}/ws/result`;
+        ws = new WebSocket(wsUrl);
+        ws.onmessage = function (event) {
+            let runtimeData;
+            try {
+                runtimeData = JSON.parse(JSON.parse(event.data));
+            } catch (error) {
+                console.error("JSON 解析錯誤:", error);
+                return;  // 如果解析失敗就直接返回
+            }
+            if ('devices' in runtimeData) {
+                cleanConnectedDevice()
+                let connectedDevices = document.getElementById('connectedDevices')
+                let devices = runtimeData['devices']
+                devices.forEach(device => {
+                    connectedDevices.appendChild(Li(`${device["connect_id"]} - \n${device["name"]}`));
+                });
+            } else if ('barcode' in runtimeData) {
+                let scanResult = document.getElementById('scanResult')
+                let barcode = runtimeData['barcode']
+                scanResult.appendChild(Li(`${barcode["code"]}`));
+            }
+        };
+
+        ws.onopen = function () {
+            console.log("✅ WebSocket 連線成功");
+            setStatus(true);
+            retryInterval = 5000; // 連線成功後重置間隔為5秒
+            clearTimeout(retryTimer); // 清除倒數計時
+            clearInterval(countdownTimer);
+        };
+
+        ws.onclose = function () {
+            console.log("❌ WebSocket 斷線，嘗試重新連線...");
+            let remainingTime = retryInterval / 1000;
+            setStatus(false, retryInterval / 1000);
+            // 開始倒數
+                countdownTimer = setInterval(function() {
+                    remainingTime--;
+                    setStatus(false, remainingTime);
+
+                    if (remainingTime <= 0) {
+                        clearInterval(countdownTimer);  // 停止倒數
+                        retryTimer = setTimeout(connectWebSocket, retryInterval); // 延遲連線
+                        // 每次重試時，將重試間隔增長 5 秒，直到最大為 30 秒
+                        retryInterval = Math.min(retryInterval + 5000, maxRetryInterval);
+                    }
+                }, 1000); // 每秒更新一次
+        };
+
+        ws.onerror = function (error) {
+            console.error("WebSocket 發生錯誤", error);
+            ws.close(); // 出錯時關閉連線，觸發 `onclose`
+        };
+
+    }
+
+    // 🚀 頁面載入時自動連線
+    connectWebSocket();
 </script>
 {% endblock %}
