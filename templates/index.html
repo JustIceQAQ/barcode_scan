@@ -31,12 +31,7 @@
     }
     const ws = new WebSocket(`${protocol[document.location.protocol]}:///${document.location.host}/ws/scan/${thisGuid}`);
 
-    function sendMessage(event) {
-        let input = document.getElementById("messageText")
-        ws.send(input.value)
-        input.value = ''
-        event.preventDefault()
-    }
+
 </script>
 
 <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
@@ -68,7 +63,7 @@
         }
     }
 
-    function startScanner() {
+    const startScanner = () => {
         Quagga.init(quaggaConf, function (err) {
             if (err) {
                 console.error(err);
@@ -76,9 +71,8 @@
             }
             Quagga.start();
         });
-
-
     }
+
 
     Quagga.onDetected(function (result) {
         let code = result.codeResult.code;
@@ -87,10 +81,12 @@
         stopScanner();
     });
 
-    function stopScanner() {
+    const stopScanner = () => {
         Quagga.stop();
         document.getElementById("interactive").style.display = "none";
     }
+
+
 </script>
 
 </html>
