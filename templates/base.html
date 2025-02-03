@@ -31,6 +31,11 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='/ios/16.png') }}">
     {% block head %}
     {% endblock %}
+
+    {% if is_debug %}
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    {% endif %}
 </head>
 <body>
 {% block body %}

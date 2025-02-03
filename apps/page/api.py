@@ -4,26 +4,36 @@ from fastapi.requests import Request
 from fastapi.websockets import WebSocket
 from fastapi.websockets import WebSocketDisconnect
 from user_agents import parse
+from configs.settings import get_settings
 
 from apps.page.schemas import Device
 from apps.page.websocket_manager import ConnectionResultPageManager
 
 page_router = APIRouter(prefix="", tags=["Page"])
 templates = Jinja2Templates(directory="templates")
+runtime_settings = get_settings()
 
 
 @page_router.get("/")
 async def index_page(
     request: Request,
 ):
-    return templates.TemplateResponse(request=request, name="index.html")
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"is_debug": runtime_settings.IS_DEBUG},
+    )
 
 
 @page_router.get("/result")
 async def result_page(
     request: Request,
 ):
-    return templates.TemplateResponse(request=request, name="result.html")
+    return templates.TemplateResponse(
+        request=request,
+        name="result.html",
+        context={"is_debug": runtime_settings.IS_DEBUG},
+    )
 
 
 result_page_manager = ConnectionResultPageManager()
