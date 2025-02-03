@@ -38,6 +38,11 @@ async def apple_touch_icon():
     return FileResponse("static/apple-touch-icon.png")
 
 
+@page_router.get("/favicon.ico")
+async def favicon():
+    return FileResponse("static/favicon.ico")
+
+
 @page_router.get("/result")
 async def result_page(
     request: Request,
