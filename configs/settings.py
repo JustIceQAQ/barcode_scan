@@ -1,5 +1,6 @@
 import datetime
 import os
+import pathlib
 from enum import Enum
 from functools import lru_cache
 
@@ -15,6 +16,11 @@ class DeployStatus(str, Enum):
     Test = "test"
 
 
+@lru_cache(maxsize=1)
+def get_work_dir() -> pathlib.Path:
+    return pathlib.Path(__file__).parent.parent.absolute()
+
+
 class GenerallySettings(BaseSettings):
     ENVIRONMENT: str
     IS_DEBUG: bool
@@ -24,6 +30,8 @@ class GenerallySettings(BaseSettings):
     FASTAPI_DOCS_URL: str | None = "/docs"
     FASTAPI_OPENAPI_URL: str | None = "/openapi.json"
     FASTAPI_REDOC_URL: str | None = "/redoc"
+
+    WORKDIR: pathlib.Path = Field(default_factory=get_work_dir)
 
 
 class LocalSettings(GenerallySettings):
