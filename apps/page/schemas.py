@@ -19,8 +19,10 @@ class Barcode(BaseModel):
 class DeviceList(BaseModel):
     devices: list[Device]
 
+
 class BarcodeDict(BaseModel):
     barcode: Barcode
+
 
 class ResultType(BaseModel):
     type: Literal["device", "data"]

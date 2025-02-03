@@ -14,6 +14,5 @@ runtime_settings = get_settings()
 async def get_status(request: Request):
     parse_result = parse(request.headers.get("user-agent"))
     return GetStatusResponse(
-        runserver_datetime=runtime_settings.RUNSERVER_DATETIME,
-        device=str(parse_result)
+        runserver_datetime=runtime_settings.RUNSERVER_DATETIME, device=str(parse_result)
     )

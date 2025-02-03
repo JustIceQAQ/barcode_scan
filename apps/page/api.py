@@ -13,17 +13,17 @@ templates = Jinja2Templates(directory="templates")
 
 
 @page_router.get("/")
-async def index_page(request: Request, ):
-    return templates.TemplateResponse(
-        request=request, name="index.html"
-    )
+async def index_page(
+    request: Request,
+):
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @page_router.get("/result")
-async def result_page(request: Request, ):
-    return templates.TemplateResponse(
-        request=request, name="result.html"
-    )
+async def result_page(
+    request: Request,
+):
+    return templates.TemplateResponse(request=request, name="result.html")
 
 
 result_page_manager = ConnectionResultPageManager()
@@ -45,8 +45,7 @@ async def websocket_scan_endpoint(websocket: WebSocket, connect_id: str):
     await websocket.accept()
 
     device = Device(
-        name=str(parse(websocket.headers.get("user-agent"))),
-        connect_id=connect_id
+        name=str(parse(websocket.headers.get("user-agent"))), connect_id=connect_id
     )
     await result_page_manager.create_connected_device(device)
     try:
