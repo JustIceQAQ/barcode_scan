@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+</head>
+<body>
+<style>
+    .pages {
+        display: flex;
+        justify-content: space-around;
+    }
+</style>
+<div class="pages">
+    <div>
+        <ul id="scanResult">Scan Result</ul>
+    </div>
+    <div>
+        <ul id="connectedDevices">Connected Device</ul>
+    </div>
+</div>
+
+</body>
+<script>
+    const cleanConnectedDevice = () => {
+        let connectedDevices = document.getElementById('connectedDevices');
+        let children = [...connectedDevices.children];
+
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].nodeType !== Node.TEXT_NODE) {
+                connectedDevices.removeChild(children[i]);
+            }
+        }
+    }
+
+
+    const Li = (context) => {
+        let li = document.createElement('li')
+        let this_context = document.createTextNode(context)
+        li.appendChild(this_context)
+        return li
+    }
+
+    var ws = new WebSocket(`ws://${document.location.host}/ws/result`);
+    ws.onmessage = function (event) {
+        let runtimeData;
+        try {
+            runtimeData = JSON.parse(JSON.parse(event.data));
+        } catch (error) {
+            console.error("JSON 解析錯誤:", error);
+            return;  // 如果解析失敗就直接返回
+        }
+        if ('devices' in runtimeData) {
+            cleanConnectedDevice()
+            let connectedDevices = document.getElementById('connectedDevices')
+            let devices = runtimeData['devices']
+            devices.forEach(device => {
+                connectedDevices.appendChild(Li(`${device["connect_id"]} - \n${device["name"]}`));
+            });
+        } else if ('barcode' in runtimeData) {
+            let scanResult = document.getElementById('scanResult')
+            let barcode = runtimeData['barcode']
+            scanResult.appendChild(Li(`${barcode["code"]}`));
+        }
+    };
+</script>
+
+</html>

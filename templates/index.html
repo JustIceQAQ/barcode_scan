@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Barcode 掃描器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+    <style>
+        video {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<button id="startButton">開始掃描</button>
+<div id="interactive" class="viewport"></div>
+<div id="result"></div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+<script>
+    const generateGuid = () => {
+        return Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);
+    }
+    const thisGuid = generateGuid()
+
+    const ws = new WebSocket(`ws:///${document.location.host}/ws/scan/${thisGuid}`);
+
+    function sendMessage(event) {
+        let input = document.getElementById("messageText")
+        ws.send(input.value)
+        input.value = ''
+        event.preventDefault()
+    }
+</script>
+
+<script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+<script>
+    document.getElementById("startButton").addEventListener("click", function () {
+        document.getElementById("interactive").style.display = "block";
+        startScanner();
+    });
+    const quaggaConf = {
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector("#interactive"),
+            constraints: {
+                width: 640,
+                height: 480,
+                facingMode: "environment" // 後置攝影機
+            }
+        },
+        decoder: {
+            readers: [{
+                format: "ean_reader",
+                config: {
+                    supplements: [
+                        'ean_5_reader', 'ean_2_reader'
+                    ]
+                }
+            }, "ean_reader"]
+        }
+    }
+
+    function startScanner() {
+        Quagga.init(quaggaConf, function (err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            Quagga.start();
+        });
+
+
+    }
+
+    Quagga.onDetected(function (result) {
+        let code = result.codeResult.code;
+        ws.send(code)
+        document.getElementById("result").innerText = "掃描結果: " + code;
+        stopScanner();
+    });
+
+    function stopScanner() {
+        Quagga.stop();
+        document.getElementById("interactive").style.display = "none";
+    }
+</script>
+
+</html>
