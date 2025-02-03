@@ -40,8 +40,12 @@
         li.appendChild(this_context)
         return li
     }
+    const protocol = {
+        "http:": "ws",
+        "https:": "wss"
+    }
 
-    var ws = new WebSocket(`ws://${document.location.host}/ws/result`);
+    var ws = new WebSocket(`${protocol[document.location.protocol]}://${document.location.host}/ws/result`);
     ws.onmessage = function (event) {
         let runtimeData;
         try {

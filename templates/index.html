@@ -25,8 +25,11 @@
             Math.random().toString(36).substring(2, 15);
     }
     const thisGuid = generateGuid()
-
-    const ws = new WebSocket(`ws:///${document.location.host}/ws/scan/${thisGuid}`);
+    const protocol = {
+        "http:": "ws",
+        "https:": "wss"
+    }
+    const ws = new WebSocket(`${protocol[document.location.protocol]}:///${document.location.host}/ws/scan/${thisGuid}`);
 
     function sendMessage(event) {
         let input = document.getElementById("messageText")
