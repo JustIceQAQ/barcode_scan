@@ -6,17 +6,41 @@ Barcode 掃描器
 
 {% block head %}
 <style>
-    video {
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        text-align: center !important;
+        background-color: #CCE8CC;
+        color: #3A3A3A;
+    }
+
+    .outside {
         width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: auto;
     }
 </style>
 {% endblock %}
 
 
 {% block body %}
-<button id="startButton">開始掃描</button>
-<div id="interactive" class="viewport"></div>
-<div id="result"></div>
+<div class="outside">
+    <div class="inside">
+        <button id="startButton" class="btn btn-primary btn-lg">開始掃描</button>
+        <div id="interactive" class="viewport"></div>
+        <div id="result"></div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block script %}

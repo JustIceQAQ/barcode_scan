@@ -10,18 +10,41 @@ Barcode 掃描結果
         display: flex;
         justify-content: space-around;
     }
+
+    body {
+        background-color: #CCE8CC;
+        color: #3A3A3A;
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="pages">
-    <div>
-        <ul id="scanResult">Scan Result</ul>
-    </div>
-    <div>
-        <ul id="connectedDevices">Connected Device</ul>
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    Scan Result
+                </div>
+                <div class="card-body">
+                    <ul id="scanResult"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    Connected Device
+                </div>
+                <div class="card-body">
+                    <ul id="connectedDevices"></ul>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block script %}
