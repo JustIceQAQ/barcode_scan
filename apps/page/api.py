@@ -64,7 +64,8 @@ async def websocket_result_endpoint(websocket: WebSocket):
     try:
         while True:
             await websocket.receive_text()
-    except WebSocketDisconnect:
+
+    except (WebSocketDisconnect, ConnectionResetError):
         result_page_manager.disconnect(websocket)
 
 
@@ -80,5 +81,5 @@ async def websocket_scan_endpoint(websocket: WebSocket, connect_id: str):
         while True:
             code = await websocket.receive_text()
             await result_page_manager.broadcast(code)
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, ConnectionResetError):
         await result_page_manager.destroy_connected_device(device)
