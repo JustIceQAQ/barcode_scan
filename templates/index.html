@@ -58,7 +58,7 @@ Barcode 掃描器
     function setStatus(isConnected) {
         const statusBar = document.getElementById('statusBar');
         if (isConnected) {
-            statusBar.textContent = '✅ 已連線';
+            statusBar.textContent = `✅ 已連線 - 設備代號: ${thisGuid}`;
             statusBar.className = 'fixed-top text-white text-center py-2 bg-success';
         } else {
             statusBar.textContent = '❌ 已斷線';
