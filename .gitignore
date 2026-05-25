@@ -338,3 +338,6 @@ cython_debug/
 #.idea/
 
 certificate/
+.wakatime-project
+.history/
+.venv/
